@@ -13,6 +13,24 @@ const LoginForm = ({ existingUser }) => {
       setUsername("");
       setPassword("");
     } catch (error) {
+      if (error.message.indexOf("There is no user record") >= 0) {
+        if (
+          window.confirm(
+            "There is no login for the email address " +
+              username +
+              ", would you like to create one with your specified password?"
+          )
+        ) {
+          try {
+            await FirebaseAuthService.registerUser(username, password);
+            setUsername("");
+            setPassword("");
+          } catch (error2) {
+            alert(error2.message);
+          }
+          return;
+        }
+      }
       alert(error.message);
     }
   }
