@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FirebaseAuthService from "../FirebaseAuthService";
+import React from "react";
 
 const LoginForm = ({ existingUser }) => {
   const [username, setUsername] = useState("");
@@ -13,11 +14,11 @@ const LoginForm = ({ existingUser }) => {
       setUsername("");
       setPassword("");
     } catch (error) {
+      // not ideal: using specific text of error message for test!
       if (error.message.indexOf("There is no user record") >= 0) {
         if (
           window.confirm(
-            "There is no login for the email address " +
-              username +
+            `There is no login for the email address ${username}` +
               ", would you like to create one with your specified password?"
           )
         ) {
@@ -28,8 +29,8 @@ const LoginForm = ({ existingUser }) => {
           } catch (error2) {
             alert(error2.message);
           }
-          return;
         }
+        return;
       }
       alert(error.message);
     }
