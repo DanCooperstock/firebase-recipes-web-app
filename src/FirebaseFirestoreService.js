@@ -6,9 +6,21 @@ const createDocument = (collection, document) => {
   return firestore.collection(collection).add(document);
 };
 
+const readDocument = (collection, cursorID) => {
+  return firestore.collection(collection).doc(cursorID).get();
+}
+
+
 // Return a promise for the results of a retrieval of a collection,
 // with optional queries applied as where clauses
-const readDocuments = ({ collection, queries }) => {
+const readDocuments = async ({
+  collection,
+  queries,
+  orderByField,
+  orderByDirection,
+  perPage,
+  cursorID,
+}) => {
   let collectionRef = firestore.collection(collection);
   // add any queries
   if (queries && queries.length > 0) {
@@ -19,6 +31,16 @@ const readDocuments = ({ collection, queries }) => {
         query.value
       );
     }
+  }
+  if (orderByField && orderByDirection) {
+    collectionRef = collectionRef.orderBy(orderByField, orderByDirection);
+  }
+  if (perPage) {
+    collectionRef = collectionRef.limit(perPage);
+  }
+  if (cursorID) {
+    const document = await readDocument(collection, cursorID);
+    collectionRef = collectionRef.startAfter(document);
   }
   return collectionRef.get();
 };

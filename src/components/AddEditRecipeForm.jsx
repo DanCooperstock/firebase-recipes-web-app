@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
 // import FirebaseFirestoreService from "../FirebaseFirestoreService";
-import { categories } from "../categories";
+import SelectForCategory from "./SelectForCategory";
 
 export default function AddEditRecipeForm({
   existingRecipe,
@@ -107,24 +107,10 @@ export default function AddEditRecipeForm({
               className="input-text"
             />
           </label>
-          <label className="recipe-label input-label">
-            Category:
-            <select
-              value={category}
-              required
-              onChange={(e) => setCategory(e.target.value)}
-              className="select"
-            >
-              <option value=""></option>
-              {Object.keys(categories).map(function (key) {
-                return (
-                  <option value={key} key={key}>
-                    {categories[key]}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
+          <SelectForCategory
+            category={category}
+            setCategoryFromEvent={(e) => setCategory(e.target.value)}
+          />
           <label className="recipe-label input-label">
             Directions:
             <textarea
