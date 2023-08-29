@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import React from "react";
 // import FirebaseFirestoreService from "../FirebaseFirestoreService";
 import SelectForCategory from "./SelectForCategory";
+import ImageUploadPreview from "./ImageUploadPreview";
 
 export default function AddEditRecipeForm({
   existingRecipe,
@@ -17,6 +18,7 @@ export default function AddEditRecipeForm({
       setPublishDate(existingRecipe.publishDate.toISOString().split("T")[0]);
       setDirections(existingRecipe.directions);
       setIngredients(existingRecipe.ingredients);
+      setImageUrl(existingRecipe.imageUrl);
     } else {
       resetForm();
     }
@@ -30,6 +32,7 @@ export default function AddEditRecipeForm({
   const [directions, setDirections] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [ingredientName, setIngredientName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   const handleAddIngredient = (e) => {
     if (e.key && e.key !== "Enter") return;
@@ -60,10 +63,14 @@ export default function AddEditRecipeForm({
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleRecipeFormSubmit = (e) => {
     e.preventDefault();
     if (ingredients.length === 0) {
       alert("Your recipe needs some ingredients before you can save it.");
+      return;
+    }
+    if (!imageUrl) {
+      alert("Missing recipe image. Please add an image.");
       return;
     }
     const isPublished = new Date(publishDate) <= new Date();
@@ -74,6 +81,7 @@ export default function AddEditRecipeForm({
       publishDate: new Date(publishDate),
       isPublished,
       ingredients,
+      imageUrl,
     };
     if (existingRecipe) {
       handleUpdateRecipe(newRecipe, existingRecipe.id);
@@ -90,12 +98,25 @@ export default function AddEditRecipeForm({
     setPublishDate(new Date().toISOString().split("T")[0]);
     setDirections("");
     setIngredients([]);
+    setImageUrl("");
   }
 
   return (
-    <form className="add-edit-recipe-form-container" onSubmit={handleSubmit}>
+    <form
+      className="add-edit-recipe-form-container"
+      onSubmit={handleRecipeFormSubmit}
+    >
       <h2>{existingRecipe ? "Update the" : "Add a New"} Recipe</h2>
       <div className="top-form-section">
+        <div className="image-input-box">
+          Recipe Image
+          <ImageUploadPreview
+            basePath="recipes"
+            existingImageUrl={imageUrl}
+            handleUploadFinish={(downloadUrl) => setImageUrl(downloadUrl)}
+            handleUploadCancel={(downloadUrl) => setImageUrl("")}
+          />
+        </div>
         <div className="fields">
           <label className="recipe-label input-label">
             Recipe Name:
