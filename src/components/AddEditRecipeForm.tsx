@@ -1,8 +1,23 @@
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useState,
+} from "react";
 import React from "react";
-// import FirebaseFirestoreService from "../FirebaseFirestoreService";
-import SelectForCategory from "./SelectForCategory";
+import SelectForCategory, { CategoryKeys } from "./SelectForCategory";
 import ImageUploadPreview from "./ImageUploadPreview";
+import { Recipe, RecipeData } from "../Recipe";
+
+type AddEditRecipeFormProps = {
+  existingRecipe: Recipe | null;
+  handleAddRecipe: (arg0: RecipeData) => Promise<void>;
+  handleUpdateRecipe: (arg0: RecipeData, arg1: string) => Promise<void>;
+  handleEditRecipeCancel: () => void;
+  handleDeleteRecipe: (arg0: string) => Promise<void>;
+};
 
 export default function AddEditRecipeForm({
   existingRecipe,
@@ -10,7 +25,7 @@ export default function AddEditRecipeForm({
   handleUpdateRecipe,
   handleEditRecipeCancel,
   handleDeleteRecipe,
-}) {
+}: AddEditRecipeFormProps) {
   useEffect(() => {
     if (existingRecipe) {
       setName(existingRecipe.name);
@@ -25,18 +40,27 @@ export default function AddEditRecipeForm({
   }, [existingRecipe]);
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<CategoryKeys | "">("");
   const [publishDate, setPublishDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [directions, setDirections] = useState("");
-  const [ingredients, setIngredients] = useState([]);
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredientName, setIngredientName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  const handleAddIngredient = (e) => {
+  const handleAddIngredientKey = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key && e.key !== "Enter") return;
     e.preventDefault();
+    handleAddIngredientCommon();
+  };
+
+  const handleAddIngredientClick = (e: MouseEvent) => {
+    e.preventDefault();
+    handleAddIngredientCommon();
+  };
+
+  const handleAddIngredientCommon = () => {
     if (!ingredientName) {
       alert("Please enter an ingredient before clicking Add Ingredient.");
       return;
@@ -45,7 +69,7 @@ export default function AddEditRecipeForm({
     setIngredientName("");
   };
 
-  const showIngredientRow = (ingredient, index) => {
+  const showIngredientRow = (ingredient: string, index: number) => {
     return (
       <tr key={index}>
         <td className="table-data text-center">{ingredient}</td>
@@ -63,7 +87,7 @@ export default function AddEditRecipeForm({
     );
   };
 
-  const handleRecipeFormSubmit = (e) => {
+  const handleRecipeFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (ingredients.length === 0) {
       alert("Your recipe needs some ingredients before you can save it.");
@@ -74,7 +98,7 @@ export default function AddEditRecipeForm({
       return;
     }
     const isPublished = new Date(publishDate) <= new Date();
-    const newRecipe = {
+    const newRecipe: RecipeData = {
       name,
       category,
       directions,
@@ -114,7 +138,7 @@ export default function AddEditRecipeForm({
             basePath="recipes"
             existingImageUrl={imageUrl}
             handleUploadFinish={(downloadUrl) => setImageUrl(downloadUrl)}
-            handleUploadCancel={(downloadUrl) => setImageUrl("")}
+            handleUploadCancel={() => setImageUrl("")}
           />
         </div>
         <div className="fields">
@@ -129,8 +153,10 @@ export default function AddEditRecipeForm({
             />
           </label>
           <SelectForCategory
-            category={category}
-            setCategoryFromEvent={(e) => setCategory(e.target.value)}
+            category={category as string}
+            setCategoryFromEvent={(e: ChangeEvent<HTMLSelectElement>) =>
+              setCategory(e.target.value as CategoryKeys)
+            }
           />
           <label className="recipe-label input-label">
             Directions:
@@ -181,14 +207,14 @@ export default function AddEditRecipeForm({
             type="text"
             value={ingredientName}
             onChange={(e) => setIngredientName(e.target.value)}
-            onKeyPress={handleAddIngredient}
+            onKeyPress={handleAddIngredientKey}
             className="input-text"
             placeholder="Ex.: 1 cup of sugar"
           />
         </label>
         <button
           type="button"
-          onClick={handleAddIngredient}
+          onClick={handleAddIngredientClick}
           className="primary-button add-ingredient-button"
         >
           Add Ingredient

@@ -1,18 +1,20 @@
-import { useState, useEffect, startTransition } from "react";
+import { useState, useEffect, startTransition, ChangeEvent } from "react";
 import React from "react";
 import FirebaseAuthService from "./FirebaseAuthService";
 import "./App.css";
 import LoginForm from "./components/LoginForm";
 import AddEditRecipeForm from "./components/AddEditRecipeForm";
-import FirebaseFirestoreService from "./FirebaseFirestoreService";
+import FirebaseFirestoreService, { Query } from "./FirebaseFirestoreService";
 import SelectForCategory, {
   lookupCategoryLabel,
 } from "./components/SelectForCategory";
+import { Recipe, RecipeData, Recipes } from "./Recipe";
+import firebase from "./FirebaseConfig";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [recipes, setRecipes] = useState([]);
-  const [currentRecipe, setCurrentRecipe] = useState(null);
+  const [user, setUser] = useState<firebase.User | null>(null);
+  const [recipes, setRecipes] = useState<Recipes>([]);
+  const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("");
   const [orderBy, setOrderBy] = useState("publishDateDesc");
@@ -32,8 +34,8 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, categoryFilter, orderBy, recipesPerPage]);
 
-  async function fetchRecipes(cursorID = "") {
-    const queries = [];
+  async function fetchRecipes(cursorID = ""): Promise<Recipes> {
+    const queries: Query[] = [];
 
     if (!user) {
       queries.push({
@@ -50,7 +52,7 @@ function App() {
       });
     }
     const orderByField = "publishDate";
-    let orderByDirection;
+    let orderByDirection: firebase.firestore.OrderByDirection | undefined;
 
     if (orderBy) {
       switch (orderBy) {
@@ -64,7 +66,7 @@ function App() {
           break;
       }
     }
-    let fetchedRecipes = [];
+    let fetchedRecipes: Recipes = [];
     try {
       const response = await FirebaseFirestoreService.readDocuments({
         collection: "recipes",
@@ -78,22 +80,31 @@ function App() {
         const id = recipeDoc.id;
         const data = recipeDoc.data();
         data.publishDate = new Date(data.publishDate.seconds * 1000);
-        return { ...data, id };
+        return {
+          name: data["name"],
+          category: data["category"],
+          directions: data["directions"],
+          ingredients: data["ingredients"],
+          isPublished: data["isPublished"],
+          publishDate: data["publishDate"],
+          imageUrl: data["imageUrl"],
+          id,
+        };
       });
       if (cursorID) {
         fetchedRecipes = [...recipes, ...newRecipes];
       } else {
         fetchedRecipes = [...newRecipes];
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message);
       throw error;
     }
     return fetchedRecipes;
   }
 
-  function handleRecipesPerPageChange(event) {
-    const recipesPerPage = event.target.value;
+  function handleRecipesPerPageChange(event: ChangeEvent<HTMLSelectElement>) {
+    const recipesPerPage = +event.target.value;
     startTransition(() => {
       setRecipes([]);
       setRecipesPerPage(recipesPerPage);
@@ -110,7 +121,7 @@ function App() {
     try {
       const fetchedRecipes = await fetchRecipes(cursorID);
       setRecipes(fetchedRecipes);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message);
       throw error;
     }
@@ -118,7 +129,7 @@ function App() {
 
   FirebaseAuthService.subscribeToAuthChanges(setUser);
 
-  async function handleAddRecipe(newRecipe) {
+  async function handleAddRecipe(newRecipe: RecipeData) {
     try {
       const response = await FirebaseFirestoreService.createDocument(
         "recipes",
@@ -126,12 +137,12 @@ function App() {
       );
       handleFetchRecipes();
       alert(`Recipe with ID ${response.id} created successfully.`);
-    } catch (error) {
+    } catch (error: any) {
       alert(error.message);
     }
   }
 
-  async function handleUpdateRecipe(newRecipe, recipeId) {
+  async function handleUpdateRecipe(newRecipe: RecipeData, recipeId: string) {
     try {
       await FirebaseFirestoreService.updateDocument(
         "recipes",
@@ -143,7 +154,7 @@ function App() {
       startTransition(() => {
         setCurrentRecipe(null);
       });
-    } catch (error) {
+    } catch (error: any) {
       alert(error.message);
       throw error;
     }
@@ -152,8 +163,11 @@ function App() {
   /**
    * @param {string} recipeId
    */
-  async function handleDeleteRecipe(recipeId) {
-    const selected = recipes.find((recipe) => recipe.id === recipeId);
+  async function handleDeleteRecipe(recipeId: string) {
+    const selected: Recipe | undefined = recipes.find(
+      (recipe) => recipe.id === recipeId
+    );
+    if (selected === undefined) return;
     if (!window.confirm(`Is it OK to delete the recipe for ${selected.name}?`))
       return;
     try {
@@ -164,13 +178,13 @@ function App() {
         setCurrentRecipe(null);
       });
       window.scrollTo(0, 0); // back to top
-    } catch (error) {
+    } catch (error: any) {
       alert(error.message);
       throw error;
     }
   }
 
-  function handleEditRecipeClick(recipeId) {
+  function handleEditRecipeClick(recipeId: string) {
     const selected = recipes.find((recipe) => recipe.id === recipeId);
     if (selected) {
       startTransition(() => {

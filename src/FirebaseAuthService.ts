@@ -2,11 +2,11 @@ import firebase from "./FirebaseConfig";
 
 const auth = firebase.auth();
 
-const registerUser = (email, password) => {
+const registerUser = (email: string, password: string) => {
   return auth.createUserWithEmailAndPassword(email, password);
 };
 
-const loginUser = (email, password) => {
+const loginUser = (email: string, password: string) => {
   return auth.signInWithEmailAndPassword(email, password);
 };
 
@@ -14,7 +14,7 @@ const logoutUser = () => {
   return auth.signOut();
 };
 
-const sendPasswordResetEmail = (email) => {
+const sendPasswordResetEmail = (email: string) => {
   return auth.sendPasswordResetEmail(email);
 };
 
@@ -23,7 +23,9 @@ const loginWithGoogle = () => {
   return auth.signInWithPopup(provider);
 };
 
-const subscribeToAuthChanges = (handleAuthStateChange) => {
+const subscribeToAuthChanges = (
+  handleAuthStateChange: (arg0: firebase.User | null) => any
+) => {
   auth.onAuthStateChanged((user) => {
     handleAuthStateChange(user);
   });

@@ -1,15 +1,32 @@
 import firebase from "./FirebaseConfig";
+import { Recipe } from "./Recipe";
 
 const firestore = firebase.firestore();
 
-const createDocument = (collection, document) => {
+export type Query = {
+  field: string;
+  condition: firebase.firestore.WhereFilterOp;
+  value: any;
+};
+
+export type Queries = Query[];
+
+const createDocument = (collection: string, document: any) => {
   return firestore.collection(collection).add(document);
 };
 
-const readDocument = (collection, cursorID) => {
+const readDocument = (collection: string, cursorID: string) => {
   return firestore.collection(collection).doc(cursorID).get();
-}
+};
 
+type ReadDocumentsProps = {
+  collection: string;
+  queries: Queries;
+  orderByField: string;
+  orderByDirection: firebase.firestore.OrderByDirection | undefined;
+  perPage: number;
+  cursorID: string;
+};
 
 // Return a promise for the results of a retrieval of a collection,
 // with optional queries applied as where clauses
@@ -20,8 +37,8 @@ const readDocuments = async ({
   orderByDirection,
   perPage,
   cursorID,
-}) => {
-  let collectionRef = firestore.collection(collection);
+}: ReadDocumentsProps) => {
+  let collectionRef: firebase.firestore.Query = firestore.collection(collection);
   // add any queries
   if (queries && queries.length > 0) {
     for (const query of queries) {
@@ -46,11 +63,11 @@ const readDocuments = async ({
 };
 
 // Return a promise for an update
-const updateDocument = (collection, id, document) => {
+const updateDocument = (collection: string, id: string, document: any) => {
   return firestore.collection(collection).doc(id).update(document);
 };
 
-const deleteDocument = (collection, id) => {
+const deleteDocument = (collection: string, id: string) => {
   return firestore.collection(collection).doc(id).delete();
 };
 

@@ -2,7 +2,7 @@ import firebase from "./FirebaseConfig";
 
 const storageRef = firebase.storage().ref();
 
-const uploadFile = (file, fullFilePath, progressCallback) => {
+const uploadFile = (file: File, fullFilePath: string, progressCallback: React.Dispatch<React.SetStateAction<number>>) => {
   const uploadTask = storageRef.child(fullFilePath).put(file);
   uploadTask.on(
     "state_changed",
@@ -22,7 +22,7 @@ const uploadFile = (file, fullFilePath, progressCallback) => {
   });
 };
 
-const deleteFile = (fileDownloadUrl) => {
+const deleteFile = (fileDownloadUrl: string) => {
   const decodedUrl = decodeURIComponent(fileDownloadUrl);
   const startIndex = decodedUrl.indexOf("/o/") + 3;
   const endIndex = decodedUrl.indexOf("?");

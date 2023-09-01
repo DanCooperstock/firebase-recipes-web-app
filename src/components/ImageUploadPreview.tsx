@@ -1,18 +1,30 @@
-import { useState, useRef, useEffect, startTransition } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  startTransition,
+  ChangeEvent,
+} from "react";
 import React from "react";
 import { v4 as uuidV4 } from "uuid";
-import FirebaseStorageService from "FirebaseStorageService";
+import FirebaseStorageService from "../FirebaseStorageService";
 
+type ImageUploadPreviewProps = {
+  basePath: string;
+  existingImageUrl: string;
+  handleUploadFinish: (arg0: string) => void;
+  handleUploadCancel: () => void;
+};
 export default function ImageUploadPreview({
   basePath,
   existingImageUrl,
   handleUploadFinish,
   handleUploadCancel,
-}) {
+}: ImageUploadPreviewProps) {
   const [uploadProgress, setUploadProgress] = useState(-1);
   const [imageUrl, setImageUrl] = useState("");
 
-  const fileInputRef = useRef();
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (existingImageUrl) {
@@ -25,13 +37,13 @@ export default function ImageUploadPreview({
     }
   }, [existingImageUrl]);
 
-  async function handleFileChanged(event) {
+  async function handleFileChanged(event: ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
-    const file = files[0];
-    if (!file) {
+    if (!files || files.length === 0 || !files[0]) {
       alert("File selection failed. Please try again.");
       return;
     }
+    const file = files[0];
     const generatedFileId = uuidV4(); // GUID
     try {
       const downloadUrl = await FirebaseStorageService.uploadFile(
@@ -41,7 +53,7 @@ export default function ImageUploadPreview({
       );
       setImageUrl(downloadUrl);
       handleUploadFinish(downloadUrl);
-    } catch (error) {
+    } catch (error: any) {
       setUploadProgress(-1);
       // @ts-ignore
       fileInputRef.current.value = null;
