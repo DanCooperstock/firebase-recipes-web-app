@@ -271,7 +271,8 @@ function App() {
                         Category: {lookupCategoryLabel(recipe.category)}
                       </div>
                       <div className="recipe-field">
-                        Publish Date: {recipe.publishDate.toLocaleDateString()}
+                        Publish Date:{" "}
+                        {recipe.publishDate.toISOString().split("T")[0]}
                       </div>
                       {user ? (
                         <button
