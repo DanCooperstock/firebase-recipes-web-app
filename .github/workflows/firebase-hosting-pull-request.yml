@@ -18,7 +18,7 @@ jobs:
       API_URL: "${{ secrets.API_URL }}"
     steps:
       - uses: actions/checkout@v3
-      - run: npm install
+      - run: npm install --force
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
