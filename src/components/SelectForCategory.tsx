@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 
 type CategoryKeys =
   | "breadsSandwichesPizza"
@@ -6,7 +6,6 @@ type CategoryKeys =
   | "dessertsBakedGoods"
   | "fishSeafood"
   | "vegetables";
-
 
 const keysList: CategoryKeys[] = [
   "breadsSandwichesPizza",
@@ -27,7 +26,7 @@ const categories: Categories = {
 };
 
 function lookupCategoryLabel(categoryKey: CategoryKeys | "") {
-  return categoryKey != "" ? categories[categoryKey] : "";
+  return categoryKey !== "" ? categories[categoryKey] : "";
 }
 
 type SelectForCategoryProps = {

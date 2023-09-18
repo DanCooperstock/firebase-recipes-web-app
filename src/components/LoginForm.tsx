@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import FirebaseAuthService from "../FirebaseAuthService";
 import React from "react";
 import firebase from "../FirebaseConfig";
+import { getErrorMessage } from "../errors";
 
 type LoginFormProps = {
   existingUser: firebase.User | null;
@@ -18,9 +19,10 @@ const LoginForm = ({ existingUser }: LoginFormProps) => {
       await FirebaseAuthService.loginUser(username, password);
       setUsername("");
       setPassword("");
-    } catch (error: any) {
+    } catch (error) {
+      const message = getErrorMessage(error);
       // not ideal: using specific text of error message for test!
-      if (error.message.indexOf("There is no user record") >= 0) {
+      if (message.indexOf("There is no user record") >= 0) {
         if (
           window.confirm(
             `There is no login for the email address ${username}` +
@@ -31,13 +33,13 @@ const LoginForm = ({ existingUser }: LoginFormProps) => {
             await FirebaseAuthService.registerUser(username, password);
             setUsername("");
             setPassword("");
-          } catch (error2: any) {
-            alert(error2.message);
+          } catch (error2) {
+            alert(getErrorMessage(error2));
           }
         }
         return;
       }
-      alert(error.message);
+      alert(message);
     }
   }
 
@@ -51,16 +53,16 @@ const LoginForm = ({ existingUser }: LoginFormProps) => {
       alert(
         "An email that will allow you to reset your password has been sent."
       );
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   }
 
   async function handleLoginWithGoogle() {
     try {
       await FirebaseAuthService.loginWithGoogle();
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   }
 

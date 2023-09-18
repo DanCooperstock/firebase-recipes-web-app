@@ -9,12 +9,13 @@ import {
 import React from "react";
 import SelectForCategory, { CategoryKeys } from "./SelectForCategory";
 import ImageUploadPreview from "./ImageUploadPreview";
-import { Recipe, RecipeData } from "../Recipe";
+import { Recipe, RecipeDataWithNumberDate } from "../Recipe";
+
 
 type AddEditRecipeFormProps = {
   existingRecipe: Recipe | null;
-  handleAddRecipe: (arg0: RecipeData) => Promise<void>;
-  handleUpdateRecipe: (arg0: RecipeData, arg1: string) => Promise<void>;
+  handleAddRecipe: (arg0: RecipeDataWithNumberDate) => Promise<void>;
+  handleUpdateRecipe: (arg0: RecipeDataWithNumberDate, arg1: string) => Promise<void>;
   handleEditRecipeCancel: () => void;
   handleDeleteRecipe: (arg0: string) => Promise<void>;
 };
@@ -98,11 +99,11 @@ export default function AddEditRecipeForm({
       return;
     }
     const isPublished = new Date(publishDate) <= new Date();
-    const newRecipe: RecipeData = {
+    const newRecipe: RecipeDataWithNumberDate = {
       name,
       category,
       directions,
-      publishDate: new Date(publishDate),
+      publishDate: new Date(publishDate).getTime() / 1000,
       isPublished,
       ingredients,
       imageUrl,

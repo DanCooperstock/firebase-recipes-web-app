@@ -18,6 +18,7 @@ import { DocumentData, QueryDocumentSnapshot } from "firebase-admin/firestore";
 import { functions, firestore, admin, storageBucket } from "./FirebaseConfig";
 import { RecipeData } from "./Recipe";
 import { Change, RuntimeOptions } from "firebase-functions/v1";
+import { getErrorMessage } from "../../src/errors";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const recipesApi = require("./recipesApi");
 
@@ -77,8 +78,10 @@ exports.onDeleteRecipe = functions.firestore
         await file.delete();
         console.log(`Successfully deleted ${fullFilePath}`);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.log(`Failed to delete ${fullFilePath}: ${error.message}`);
+      } catch (error) {
+        console.log(
+          `Failed to delete ${fullFilePath}: ${getErrorMessage(error)}`
+        );
       }
     }
     updateBothCounts(recipe.isPublished, -1, 0);

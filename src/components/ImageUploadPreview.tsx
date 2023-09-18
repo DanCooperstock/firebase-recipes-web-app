@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { v4 as uuidV4 } from "uuid";
 import FirebaseStorageService from "../FirebaseStorageService";
+import { alertAndThrow } from "../errors";
 
 type ImageUploadPreviewProps = {
   basePath: string;
@@ -53,12 +54,11 @@ export default function ImageUploadPreview({
       );
       setImageUrl(downloadUrl);
       handleUploadFinish(downloadUrl);
-    } catch (error: any) {
+    } catch (error) {
       setUploadProgress(-1);
       // @ts-ignore
       fileInputRef.current.value = null;
-      alert(error.message);
-      throw error;
+      alertAndThrow(error);
     }
   }
 

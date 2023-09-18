@@ -5,15 +5,21 @@ import "./App.css";
 import LoginForm from "./components/LoginForm";
 import AddEditRecipeForm from "./components/AddEditRecipeForm";
 import FirebaseFirestoreService, { Query } from "./FirebaseFirestoreService";
+import FirebaseFirestoreRestService from "./FirebaseFirestoreRestService";
 import SelectForCategory, {
   lookupCategoryLabel,
 } from "./components/SelectForCategory";
-import { Recipe, RecipeData, Recipes } from "./Recipe";
+import {
+  Recipe,
+  RecipeDataWithNumberDate,
+  RecipeWithNumberDate,
+} from "./Recipe";
 import firebase from "./FirebaseConfig";
+import { alertAndThrow, getErrorMessage } from "./errors";
 
 function App() {
   const [user, setUser] = useState<firebase.User | null>(null);
-  const [recipes, setRecipes] = useState<Recipes>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -34,7 +40,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, categoryFilter, orderBy, recipesPerPage]);
 
-  async function fetchRecipes(cursorID = ""): Promise<Recipes> {
+  async function fetchRecipes(cursorID = ""): Promise<Recipe[]> {
     const queries: Query[] = [];
 
     if (!user) {
@@ -66,38 +72,32 @@ function App() {
           break;
       }
     }
-    let fetchedRecipes: Recipes = [];
+    let fetchedRecipes: Recipe[] = [];
     try {
-      const response = await FirebaseFirestoreService.readDocuments({
+      const response = await FirebaseFirestoreRestService.readDocuments({
         collection: "recipes",
         queries,
         orderByField,
-        orderByDirection: orderByDirection,
-        perPage: recipesPerPage,
-        cursorID,
+        orderByDirection,
       });
-      const newRecipes = response.docs.map((recipeDoc) => {
-        const id = recipeDoc.id;
-        const data = recipeDoc.data();
-        data.publishDate = new Date(data.publishDate.seconds * 1000);
-        return {
-          name: data["name"],
-          category: data["category"],
-          directions: data["directions"],
-          ingredients: data["ingredients"],
-          isPublished: data["isPublished"],
-          publishDate: data["publishDate"],
-          imageUrl: data["imageUrl"],
-          id,
-        };
-      });
-      if (cursorID) {
-        fetchedRecipes = [...recipes, ...newRecipes];
-      } else {
-        fetchedRecipes = [...newRecipes];
+      if (response && response.documents) {
+        fetchedRecipes = response.documents.map(
+          (recipe: RecipeWithNumberDate) => {
+            return {
+              id: recipe.id,
+              name: recipe.name,
+              category: recipe.category,
+              directions: recipe.directions,
+              ingredients: recipe.ingredients,
+              isPublished: recipe.isPublished,
+              publishDate: new Date(recipe.publishDate * 1000),
+              imageUrl: recipe.imageUrl,
+            };
+          }
+        );
       }
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+      console.error(getErrorMessage(error));
       throw error;
     }
     return fetchedRecipes;
@@ -121,42 +121,45 @@ function App() {
     try {
       const fetchedRecipes = await fetchRecipes(cursorID);
       setRecipes(fetchedRecipes);
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+      console.error(getErrorMessage(error));
       throw error;
     }
   }
 
   FirebaseAuthService.subscribeToAuthChanges(setUser);
 
-  async function handleAddRecipe(newRecipe: RecipeData) {
+  async function handleAddRecipe(newRecipe: RecipeDataWithNumberDate) {
     try {
-      const response = await FirebaseFirestoreService.createDocument(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await FirebaseFirestoreRestService.createDocument(
         "recipes",
         newRecipe
       );
       handleFetchRecipes();
-      alert(`Recipe with ID ${response.id} created successfully.`);
-    } catch (error: any) {
-      alert(error.message);
+      alert(`Recipe for "${newRecipe.name}" created successfully.`);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   }
 
-  async function handleUpdateRecipe(newRecipe: RecipeData, recipeId: string) {
+  async function handleUpdateRecipe(
+    newRecipe: RecipeDataWithNumberDate,
+    recipeId: string
+  ) {
     try {
-      await FirebaseFirestoreService.updateDocument(
+      await FirebaseFirestoreRestService.updateDocument(
         "recipes",
         recipeId,
         newRecipe
       );
       handleFetchRecipes(); // redisplay changes
-      alert(`Successfully updated recipe with ID ${recipeId}.`);
+      alert(`Successfully updated recipe for "${newRecipe.name}".`);
       startTransition(() => {
         setCurrentRecipe(null);
       });
-    } catch (error: any) {
-      alert(error.message);
-      throw error;
+    } catch (error) {
+      alertAndThrow(error);
     }
   }
 
@@ -168,19 +171,20 @@ function App() {
       (recipe) => recipe.id === recipeId
     );
     if (selected === undefined) return;
-    if (!window.confirm(`Is it OK to delete the recipe for ${selected.name}?`))
+    if (
+      !window.confirm(`Is it OK to delete the recipe for "${selected.name}"?`)
+    )
       return;
     try {
-      await FirebaseFirestoreService.deleteDocument("recipes", recipeId);
+      await FirebaseFirestoreRestService.deleteDocument("recipes", recipeId);
       handleFetchRecipes(); // redisplay changes
-      alert(`Successfully deleted recipe for ${selected.name}.`);
+      alert(`Successfully deleted recipe for "${selected.name}".`);
       startTransition(() => {
         setCurrentRecipe(null);
       });
       window.scrollTo(0, 0); // back to top
-    } catch (error: any) {
-      alert(error.message);
-      throw error;
+    } catch (error) {
+      alertAndThrow(error);
     }
   }
 

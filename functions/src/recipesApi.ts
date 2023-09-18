@@ -23,6 +23,7 @@ import {
   RecipeDataWithRealDate,
   RecipeWithNumberDate,
 } from "./Recipe";
+import { getErrorMessage } from "../../src/errors";
 // import { Utilities } from "./utilities";
 
 const app: Express = express();
@@ -43,8 +44,8 @@ const checkAuth = async (
 
   try {
     await authorizeUser(authorizationHeader, auth);
-  } catch (error: any) {
-    response.status(401).send(error.message);
+  } catch (error) {
+    response.status(401).send(getErrorMessage(error));
     return false;
   }
   return true;
@@ -84,8 +85,8 @@ app.post("/recipes", async (request: Request, response: Response) => {
       .add(recipe);
     const recipeId = firestoreResponse.id;
     response.status(201).send({ id: recipeId });
-  } catch (error: any) {
-    response.status(400).send(error.message);
+  } catch (error) {
+    response.status(400).send(getErrorMessage(error));
     return;
   }
 });
@@ -155,8 +156,8 @@ app.get("/recipes", async (request: Request, response: Response) => {
 
     const payload = { recipeCount, isAuth, documents: fetchedRecipes };
     response.status(200).send(payload);
-  } catch (error: any) {
-    response.status(400).send(error.message);
+  } catch (error) {
+    response.status(400).send(getErrorMessage(error));
   }
 });
 
@@ -172,8 +173,8 @@ app.put("/recipes/:id", async (request: Request, response: Response) => {
   try {
     await firestore.collection("recipes").doc(id).set(recipe);
     response.status(200).send({ id });
-  } catch (error: any) {
-    response.status(400).send(error.message);
+  } catch (error) {
+    response.status(400).send(getErrorMessage(error));
   }
 });
 
@@ -186,8 +187,8 @@ app.delete("/recipes/:id", async (request: Request, response: Response) => {
   try {
     await firestore.collection("recipes").doc(id).delete();
     response.status(200).send();
-  } catch (error: any) {
-    response.status(400).send(error.message);
+  } catch (error) {
+    response.status(400).send(getErrorMessage(error));
   }
 });
 

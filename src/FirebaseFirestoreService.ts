@@ -1,5 +1,5 @@
 import firebase from "./FirebaseConfig";
-import { Recipe } from "./Recipe";
+// import { Recipe } from "./Recipe";
 
 const firestore = firebase.firestore();
 
@@ -38,7 +38,8 @@ const readDocuments = async ({
   perPage,
   cursorID,
 }: ReadDocumentsProps) => {
-  let collectionRef: firebase.firestore.Query = firestore.collection(collection);
+  let collectionRef: firebase.firestore.Query =
+    firestore.collection(collection);
   // add any queries
   if (queries && queries.length > 0) {
     for (const query of queries) {

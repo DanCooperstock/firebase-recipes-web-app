@@ -1,35 +1,33 @@
-export type RecipeData = {
+export interface RecipeDataBase {
   name: string;
   category: string;
   directions: string;
   ingredients: string[];
   isPublished: boolean;
+  imageUrl: string;
+}
+
+export interface RecipeData extends RecipeDataBase {
   publishDate: { _seconds: number };
-  imageUrl: string;
-};
+}
 
-export type RecipeDataWithNumberDate = {
-  name: string;
-  category: string;
-  directions: string;
-  ingredients: string[];
-  isPublished: boolean;
+export interface RecipeDataWithNumberDate extends RecipeDataBase {
   publishDate: number;
-  imageUrl: string;
-};
+}
 
-export type RecipeDataWithRealDate = {
-  name: string;
-  category: string;
-  directions: string;
-  ingredients: string[];
-  isPublished: boolean;
+export interface RecipeDataWithRealDate extends RecipeDataBase {
   publishDate: Date;
-  imageUrl: string;
-};
+}
 
-export type Recipe = RecipeData & { id: string };
+export interface Recipe extends RecipeData {
+  id: string;
+}
 
-export type RecipeWithNumberDate = RecipeDataWithNumberDate & { id: string };
+export interface RecipeWithNumberDate extends RecipeDataWithNumberDate {
+  id: string;
+}
 
-export type RecipeDoc = { data: () => RecipeData; id: string };
+export interface RecipeDoc {
+  data: () => RecipeData;
+  id: string;
+}
