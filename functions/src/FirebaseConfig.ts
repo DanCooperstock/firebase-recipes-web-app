@@ -1,12 +1,10 @@
-import { AppOptions } from "firebase-admin";
-
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { Auth } from "firebase-admin/auth";
 
 const FIREBASE_STORAGE_BUCKET = "fir-recipes-9dfd5.appspot.com";
 
-const apiFirebaseOptions: AppOptions = {
+const apiFirebaseOptions: admin.AppOptions = {
   ...functions.config().firebase,
   credential: admin.credential.applicationDefault(),
 };
