@@ -26,6 +26,9 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [orderBy, setOrderBy] = useState("publishDateDesc");
   const [recipesPerPage, setRecipesPerPage] = useState(3);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     setIsLoading(true);
@@ -39,7 +42,7 @@ function App() {
       })
       .finally(() => setIsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, categoryFilter, orderBy, recipesPerPage]);
+  }, [user, categoryFilter, orderBy, recipesPerPage, currentPage]);
 
   async function fetchRecipes(cursorID = ""): Promise<Recipe[]> {
     const queries: Query[] = [];
@@ -80,8 +83,32 @@ function App() {
         queries,
         orderByField,
         orderByDirection,
+        perPage: recipesPerPage,
+        pageNumber: currentPage,
       });
       if (response && response.documents) {
+        setTotalPages(Math.ceil(response.recipeCount / recipesPerPage));
+
+        const nextPageResponse =
+          await FirebaseFirestoreRestService.readDocuments({
+            collection: "recipes",
+            queries,
+            orderByField,
+            orderByDirection,
+            perPage: recipesPerPage,
+            pageNumber: currentPage + 1,
+          });
+        setIsLastPage(
+          nextPageResponse &&
+            nextPageResponse.documents &&
+            nextPageResponse.documents.length === 0
+        );
+
+        if (response.documents.length === 0 && currentPage !== 1) {
+          startTransition(() => {
+            setCurrentPage(currentPage - 1);
+          });
+        }
         fetchedRecipes = response.documents.map(
           (recipe: RecipeWithNumberDate) => {
             return {
@@ -112,11 +139,11 @@ function App() {
     });
   }
 
-  function handleLoadMoreRecipesClick() {
-    const lastRecipe = recipes[recipes.length - 1];
-    const cursorID = lastRecipe.id;
-    handleFetchRecipes(cursorID);
-  }
+  // function handleLoadMoreRecipesClick() {
+  //   const lastRecipe = recipes[recipes.length - 1];
+  //   const cursorID = lastRecipe.id;
+  //   handleFetchRecipes(cursorID);
+  // }
 
   async function handleFetchRecipes(cursorID = "") {
     try {
@@ -310,13 +337,68 @@ function App() {
               </select>
             </label>
             <div className="pagination">
-              <button
+              {/* <button
                 type="button"
                 onClick={handleLoadMoreRecipesClick}
                 className="primary-button"
               >
                 LOAD MORE RECIPES
-              </button>
+              </button> */}
+              <div className="row">
+                <button
+                  className={
+                    currentPage === 1
+                      ? "primary-button hidden"
+                      : "primary-button"
+                  }
+                  type="button"
+                  onClick={() =>
+                    startTransition(() => {
+                      setCurrentPage(currentPage - 1);
+                    })
+                  }
+                >
+                  Previous
+                </button>
+                <div>Page {currentPage}</div>
+                <button
+                  className={
+                    isLastPage ? "primary-button hidden" : "primary-button"
+                  }
+                  type="button"
+                  onClick={() =>
+                    startTransition(() => {
+                      setCurrentPage(currentPage + 1);
+                    })
+                  }
+                >
+                  Next
+                </button>
+              </div>
+              <div className="row">
+                {!categoryFilter
+                  ? new Array(totalPages).fill(0).map((value, index) => {
+                      return (
+                        <button
+                          key={index + 1}
+                          type="button"
+                          className={
+                            currentPage === index + 1
+                              ? "selected-page primary-button page-button"
+                              : "primary-button page-button"
+                          }
+                          onClick={() =>
+                            startTransition(() => {
+                              setCurrentPage(index + 1);
+                            })
+                          }
+                        >
+                          {index + 1}
+                        </button>
+                      );
+                    })
+                  : null}
+              </div>
             </div>
           </>
         ) : null}
