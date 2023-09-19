@@ -4,8 +4,9 @@ import FirebaseAuthService from "./FirebaseAuthService";
 import "./App.css";
 import LoginForm from "./components/LoginForm";
 import AddEditRecipeForm from "./components/AddEditRecipeForm";
-import FirebaseFirestoreService, { Query } from "./FirebaseFirestoreService";
-import FirebaseFirestoreRestService from "./FirebaseFirestoreRestService";
+import FirebaseFirestoreRestService, {
+  Query,
+} from "./FirebaseFirestoreRestService";
 import SelectForCategory, {
   lookupCategoryLabel,
 } from "./components/SelectForCategory";

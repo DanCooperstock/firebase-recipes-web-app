@@ -1,0 +1,64 @@
+[debug] [2023-09-18T23:57:13.270Z] ----------------------------------------------------------------------
+[debug] [2023-09-18T23:57:13.272Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dcoop\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2023-09-18T23:57:13.272Z] CLI Version:   12.5.4
+[debug] [2023-09-18T23:57:13.273Z] Platform:      win32
+[debug] [2023-09-18T23:57:13.273Z] Node Version:  v18.17.1
+[debug] [2023-09-18T23:57:13.273Z] Time:          Mon Sep 18 2023 19:57:13 GMT-0400 (Eastern Daylight Time)
+[debug] [2023-09-18T23:57:13.274Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-09-18T23:57:13.356Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-09-18T23:57:13.356Z] > authorizing via signed-in user (dcoops@software4nonprofits.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\donation\firebase-course
+
+Before we get started, keep in mind:
+
+  * You are currently outside your home directory
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2023-09-18T23:57:14.696Z] Using project from CLI flag: fir-recipes-9dfd5
+[debug] [2023-09-18T23:57:14.699Z] > refreshing access token with scopes: []
+[debug] [2023-09-18T23:57:14.704Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-09-18T23:57:14.704Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-09-18T23:57:14.900Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2023-09-18T23:57:14.900Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-09-18T23:57:14.915Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fir-recipes-9dfd5 [none]
+[debug] [2023-09-18T23:57:15.222Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fir-recipes-9dfd5 200
+[debug] [2023-09-18T23:57:15.223Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fir-recipes-9dfd5 {"projectId":"fir-recipes-9dfd5","projectNumber":"267268844509","displayName":"firebase-recipes","name":"projects/fir-recipes-9dfd5","resources":{"hostingSite":"fir-recipes-9dfd5","storageBucket":"fir-recipes-9dfd5.appspot.com","locationId":"northamerica-northeast1"},"state":"ACTIVE","etag":"1_e80e7d20-fa7a-4d37-aed9-ee344a8520cc"}
+[info] i  Using project fir-recipes-9dfd5 (firebase-recipes) 
+[info] 
+=== Functions Setup
+[debug] [2023-09-18T23:57:15.241Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-09-18T23:57:15.241Z] > authorizing via signed-in user (dcoops@software4nonprofits.com)
+[debug] [2023-09-18T23:57:15.242Z] [iam] checking project fir-recipes-9dfd5 for permissions ["firebase.projects.get"]
+[debug] [2023-09-18T23:57:15.243Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fir-recipes-9dfd5:testIamPermissions [none]
+[debug] [2023-09-18T23:57:15.243Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fir-recipes-9dfd5:testIamPermissions x-goog-quota-user=projects/fir-recipes-9dfd5
+[debug] [2023-09-18T23:57:15.243Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fir-recipes-9dfd5:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-09-18T23:57:15.368Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fir-recipes-9dfd5:testIamPermissions 200
+[debug] [2023-09-18T23:57:15.369Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fir-recipes-9dfd5:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-09-18T23:57:15.371Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/cloudfunctions.googleapis.com [none]
+[debug] [2023-09-18T23:57:15.371Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/fir-recipes-9dfd5
+[debug] [2023-09-18T23:57:15.376Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/runtimeconfig.googleapis.com [none]
+[debug] [2023-09-18T23:57:15.376Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/fir-recipes-9dfd5
+[debug] [2023-09-18T23:57:15.726Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/runtimeconfig.googleapis.com 200
+[debug] [2023-09-18T23:57:15.726Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2023-09-18T23:57:15.732Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/cloudfunctions.googleapis.com 200
+[debug] [2023-09-18T23:57:15.732Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/fir-recipes-9dfd5/services/cloudfunctions.googleapis.com [omitted]
+[info] 
+Detected existing codebase(s): default
+

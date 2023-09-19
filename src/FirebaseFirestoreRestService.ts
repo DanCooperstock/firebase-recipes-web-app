@@ -41,7 +41,11 @@ const createDocument = async (
   }
 };
 
-type Query = { field: string; value: string };
+export type Query = {
+  field: string;
+  condition: string;
+  value: string | boolean;
+};
 
 type ReadDocumentsArgs = {
   collection: string;
@@ -56,7 +60,7 @@ const readDocuments = async (arg: ReadDocumentsArgs) => {
   try {
     const url = new URL(`${BASE_URL}/${arg.collection}`);
     for (const query of arg.queries) {
-      url.searchParams.append(query.field, query.value);
+      url.searchParams.append(query.field, query.value.toString());
     }
     if (arg.orderByField) {
       url.searchParams.append("orderByField", arg.orderByField);
