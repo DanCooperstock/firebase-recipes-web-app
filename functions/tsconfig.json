@@ -10,6 +10,5 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["src", "../src/FirebaseFirestoreRestService.ts"],
-  "exclude": ["node-modules", "functions"]
+  "include": ["src", "../src/FirebaseFirestoreRestService.ts"]
 }
